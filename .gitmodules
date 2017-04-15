@@ -1,0 +1,3 @@
+[submodule "char-rnn-tensorflow"]
+	path = char-rnn-tensorflow
+	url = git@github.com:sherjilozair/char-rnn-tensorflow.git
