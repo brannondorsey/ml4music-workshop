@@ -1,3 +1,6 @@
 [submodule "char-rnn-tensorflow"]
 	path = char-rnn-tensorflow
 	url = git@github.com:sherjilozair/char-rnn-tensorflow.git
+[submodule "midi-rnn"]
+	path = midi-rnn
+	url = https://github.com/brannondorsey/midi-rnn.git
