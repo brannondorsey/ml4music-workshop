@@ -6,7 +6,8 @@
 # 	if --gpu flag is provided, nvidia-docker will be used instead of docker
 
 IMAGE_NAME="brannondorsey/ml4music-workshop"
-DOCKER="docker" 
+DOCKER="docker"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 if [ "$1" ] && [ "$1" == "--gpu" ]; then
 	echo "Using nvidia-docker..."
@@ -15,7 +16,9 @@ fi
 
 if [ ! "$(docker ps -a | grep $IMAGE_NAME)" ]; then
 	echo "Container does not exist, creating one..."
-	$DOCKER run -it -p 7006:7006 -p 7007:7007 -p 7008:7008 $IMAGE_NAME
+	$DOCKER run -it -p 7006:7006 -p 7007:7007 -p 7008:7008 \
+		-v $DIR/data:/root/ml4music-workshop/data \
+		$IMAGE_NAME
 else
 	if [ ! "$(docker ps | grep $IMAGE_NAME)" ]; then
 			echo "Container exists and is not running, starting container..."
