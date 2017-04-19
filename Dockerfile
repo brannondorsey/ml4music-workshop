@@ -25,23 +25,17 @@ COPY setup_wavenet_venv.sh /root/ml4music-workshop/tensorflow-wavenet/setup_wave
 RUN /root/ml4music-workshop/tensorflow-wavenet/setup_wavenet_venv.sh
 RUN rm setup_wavenet_venv.sh
 
-# expose tensorboard ports
-# 6006 - char-rnn
-# 6007 - midi-rnn
-# 6008 - wavenet
-
-# RUN tensorboard --port 7008 --logdir \
-#  		/root/ml4music-workshop/char-rnn-tensorflow/logs &> /dev/null
-
-EXPOSE 7006
-EXPOSE 7007 
-# EXPOSE 7008
-
 WORKDIR /root/ml4music-workshop
 
 # expose tensorboard ports
-# 6006 - char-rnn
-# 6007 - midi-rnn
-# 6008 - wavenet
+# 7006 - char-rnn
+# 7007 - midi-rnn
+# 7008 - wavene7
+
+EXPOSE 7006
+EXPOSE 7007 
+EXPOSE 7008
+
 CMD tensorboard --port 7006 --logdir /root/ml4music-workshop/char-rnn-tensorflow/logs &> /dev/null && \
-    tensorboard --port 7007 --logdir /root/ml4music-workshop/midi-rnn/experiments &> /dev/null && bash
+    tensorboard --port 7007 --logdir /root/ml4music-workshop/midi-rnn/experiments &> /dev/null && \
+    tensorboard --port 7008 --logdir /root/ml4music-workshop/tensorflow-wavenet/logdir &> /dev/null && bash
