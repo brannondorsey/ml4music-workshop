@@ -4,3 +4,6 @@
 [submodule "midi-rnn"]
 	path = midi-rnn
 	url = https://github.com/brannondorsey/midi-rnn.git
+[submodule "tensorflow-wavenet"]
+	path = tensorflow-wavenet
+	url = https://github.com/ibab/tensorflow-wavenet.git
