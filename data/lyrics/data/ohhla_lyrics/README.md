@@ -13,5 +13,10 @@ finx ohhla.com -name *.txt | wc -l
 If that number stops going up for a long period of time (overnight) you can likely stop the download. Combine all lyrics into one file with:
 
 ```bash
-find ohhla.com -name *.txt | xargs cat > lyrics.txt
+find ohhla.com -name *.txt | xargs cat > lyrics_tmp.txt
+```
+
+```bash
+# strip non utf-8 chars
+iconv -f utf-8 -t utf-8 -c lyrics_tmp.txt -o lyrics.txt
 ```
