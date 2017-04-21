@@ -23,7 +23,7 @@ First, lets get you a copy of this here code. There should be a "Clone or Downlo
 
 If you are comfortable using git, you can instead clown this repo with:
 
-```
+```bash
 git clone https://github.com/brannondorsey/ml4music-workshop.git
 ```
 
@@ -54,7 +54,7 @@ cd /path/to/this/folder
 
 The first time you run it it needs to download our Docker Image from the internet (~2GB), so this may take a while. Once complete, you should see the message:
 
-```
+```bash
 Starting TensorBoard 41 on port 7006.
 (You can navigate to http://172.17.0.2:7006)
 ``` 
@@ -69,7 +69,7 @@ Given any text file, cha-rnn learns the patterns present in that file one charac
 
 The particular implementation of char-rnn that we will be using is called [char-rnn-tensorflow](https://github.com/sherjilozair/char-rnn-tensorflow). In the Machine Learning community, it is very common for a paper to be published, or a new method proposed, giving an algorithm or model architecture a certain name. Soon a handful of seperate implementations using different languages or frameworks appear with descriptive variations on that name.
 
-We will begin using char-rnn by training an RNN model on a corpus of top 100s billboard lyrics from 1946-2015. For the remainder of this document, it will be assumed that we are executing commands inside of the Docker container we've attached to with `start.sh`.
+We will begin using char-rnn by training an RNN model on a corpus of [Billboard's yearly top 100s lyrics from 1946-2015](http://kaylinwalker.com/50-years-of-pop-music/). For the remainder of this document, it will be assumed that we are executing commands inside of the Docker container we've attached to with `start.sh`.
 
 ```bash
 # navigate to the char-rnn-tensorflow directory
@@ -93,7 +93,7 @@ python train.py --help
 
 This gives us a list of command-line arguments that we can use to change the behavior of `train.py`. Command-line arguments follow the name of the script/program you are running when executing a command on the command-line. You can include as many of them as you wish and their order doesn't matter. Their general format looks like this:
 
-```
+```bash
 # this is pseudocode, don't run this
 program_name --argument_1 value_1 --argument_2 value_2 # etc...
 ```
@@ -110,7 +110,7 @@ python train.py --data_dir ../data/lyrics/data/billboard_lyrics_1946-2015
 
 After a brief moment, you should see continuous output that looks like this:
 
-```
+```bash
 1/154000 (epoch 0), train_loss = 3.759, time/batch = 0.117
 2/154000 (epoch 0), train_loss = 3.203, time/batch = 0.118
 3/154000 (epoch 0), train_loss = 3.000, time/batch = 0.115
@@ -199,3 +199,78 @@ Char-rnn is a general purpose generative model and has uses far beyond our narro
 
 - [Clickbait advertisements](http://clickotron.com/) (great blog post)
 - [Raw audio waveforms trained on a human voice](https://www.youtube.com/watch?v=NG-LATBZNBs)
+
+## Music generation with midi-rnn
+
+To learn from and create new music, will use [midi-rnn](https://github.com/brannondorsey/midi-rnn). [MIDI](https://en.wikipedia.org/wiki/MIDI) is a standard protocol for representing music scores and recordings as symbolic data. MIDI  represents a note (e.g., when the synth player performs a note, the note "A4" is recorded), whereas digital audio represents the sound produced by the note. You can think of MIDI as being akin to sheet music, where it stores the instructions a software synthesizer uses to re-create music instead of the actual recorded audio samples as with `.wav` or `.mp3` files.
+
+This kind of data format is especially useful to us because it encodes a very high-level representation of musical structure with very little unnecessary noise (pun 100% intended).
+
+midi-rnn is essentially an identical rnn algorithm to char-rnn only I've written it to accept midi note events instead of text characters. I've also done my best to author it so that the interface is as similar to `char-rnn-tensorflow` as possible. You will train and generate with its `train.py` and `sample.py` scripts just like char-rnn. Some of the command-line arguments are different, but I've tried to keep them as similar as possible.
+
+### Training a midi-rnn model
+
+First, navigate into the `midi-rnn/` folder:
+```bash
+# if you were previously inside char-rnn-tensorflow
+cd ../midi-rnn
+```
+
+I've compiled a collection of ~130 monophonic MIDI tracks inside of `data/midi/data/starter_files` that we can use for our initial training. After that, I highly recommend checking out the [Lakh MIDI Dataset](http://colinraffel.com/projects/lmd/) to grab some more.
+
+```bash
+python train.py --data_dir ../data/midi/data/starter_files
+```
+
+If all goes well you should see an output somewhat simlar to this:
+
+```bash
+[*] Found 183 midi files in ../data/midi/data/starter_files/
+[*] Created experiment directory experiments/01
+[*] Created checkpoint directory experiments/01/checkpoints
+[*] Created log directory experiments/01/tensorboard-logs
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+lstm_1 (LSTM)                (None, 64)                49664     
+_________________________________________________________________
+dropout_1 (Dropout)          (None, 64)                0         
+_________________________________________________________________
+dense_1 (Dense)              (None, 129)               8385      
+_________________________________________________________________
+activation_1 (Activation)    (None, 129)               0         
+=================================================================
+Total params: 58,049
+Trainable params: 58,049
+Non-trainable params: 0
+_________________________________________________________________
+None
+[*] Saved model to experiments/01/model.json
+fitting model...
+Epoch 1/10
+4728/4729 [============================>.] - ETA: 0s - loss: 2.5597 
+```
+
+Notice the text `Epoch 1/10`? In machine learning, an epoch represents one full pass training on each sample in your dataset. By default, `midi-rnn` will train for 10 epochs, but you can configure it to train longer using the `--num_epochs` argument. You can also stop training at any time with CTRL+C like before. 
+
+To view your training loss, point your browser to:
+
+	- <http://localhost:7007> (note the port has incremented by one)
+
+midi-rnn's tensorboard interface has a few more metrics than `char-rnn-tensorflow`.
+
+- `acc`: Training data accuracy. We want this to go up, as it represents the percentage of events that our model is correctly predicting.
+- `loss`: This is our training data loss (equivalent to `train_loss` in char-rnn). We want this value to go down.
+- `lr`: This is the learning rate of our network. We haven't talked about this but it is basically a value that we choose to control how large the updates to our training updates are each training step. You can ignore this for now.
+- `val_acc`: Validation data accuracy. This is a measure of how accurate our model is at predicting data it has never seen before (not the training data). This represents how well our model generalizes. A high test accuracy and low validation accuracy (or a low test loss and high validation loss) indicates that our model is [overfitting](https://en.wikipedia.org/wiki/Overfitting), or likely memorizing the data that it is being shown instead of extracting only the patterns from it.
+- `val_loss`: This is our validation loss. Equivalent to the training loss but on unseen validation data. We want this value to go down.
+
+### Generating music with a trained midi-rnn model
+
+Once your model has finished training, you have chosen to stop it early, or you just want to check how the training is going (yep you can do that! midi-rnn saves model checkpoints every epoch) you can generate new monophonic midi files with `sample.py`:
+
+```bash
+python sample.py --experiment_dir experiments/01 \
+			     --data_dir ../data/midi/data/starter_files \ 
+			     --save_dir ../data/midi/generated
+``` 
