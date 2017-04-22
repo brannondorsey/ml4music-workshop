@@ -15,6 +15,11 @@ WORKDIR $DOCKER_HOME/ml4music-workshop
 RUN git submodule init
 RUN git submodule update
 
+# remove unnecessary files
+RUN rm setup_wavenet_venv.sh
+RUN rm Dockerfile
+RUN rm -rf notebooks
+
 # instal pip and pip dependencies
 RUN pip install --upgrade pip
 RUN pip install virtualenv
