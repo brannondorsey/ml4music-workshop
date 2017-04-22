@@ -1,5 +1,5 @@
 # ml4music-workshop
-Machine Learning for Music, Audio, and Sound Synthesis workshop @ the School of the Art Institute of Chicago, April 23rd, 2017.
+Machine Learning for Music, Audio, and Sound Synthesis workshop @ the School of the Art Institute of Chicago, April 23rd, 2017. If you can't make it, or found this on the interwebz, I've written this README so that you can follow along on your own at home :)
 
 ## Overview
 
