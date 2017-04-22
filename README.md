@@ -21,7 +21,7 @@ I've created a [Docker](https://opensource.com/resources/what-docker) image that
 
 First, lets get you a copy of this here code. There should be a "Clone or Download" button on the right side of this GitHub page. Click that select "Download ZIP". Unzip :)
 
-If you are comfortable using git, you can instead clown this repo with:
+If you are comfortable using git, you can instead clone this repo with:
 
 ```bash
 git clone https://github.com/brannondorsey/ml4music-workshop.git
@@ -292,3 +292,67 @@ python sample.py --experiment_dir experiments/01 --data_dir ../data/midi/data/st
 
 By default, this generates 10 MIDI files (each 1000 sixteenth notes long) using an "Acoustic Grand Piano" as the General MIDI instrument. Each can be adjusted using the `--num_files`, `--file_length`, and `--midi_instrument` flags respectively. See [here](https://en.wikipedia.org/wiki/General_MIDI) for a list of General MIDI instrument numbers.
 
+## Raw Audio generation with WaveNet
+
+Last year, Google's Deep Mind [published a paper](https://arxiv.org/pdf/1609.03499.pdf) demonstrating a novel model for raw audio waveforms called [WaveNet](https://deepmind.com/blog/wavenet-generative-model-raw-audio/). WaveNet predicts the next sample in an audio sequence conditioned on all previous samples and works with audio sampled at rates of 16kHz! 
+
+Training a WaveNet model is increadibly difficult and compute-intensive. Training models takes days running on consumer grade GPUs and isn't much worth trying on CPUs. I've had very poor results with WaveNet after just one experiment.
+
+- [Original track](http://brannondorsey.com/files/ml4music_workshop/wavenet_12_hours.wav), Erykah Badu's "On and on" (A capella) 
+- [WaveNet generated track](http://brannondorsey.com/files/ml4music_workshop/wavenet_12_hours.mp3) after ~12 hours of training on 1xGTX1080
+- [WaveNet generated track](http://brannondorsey.com/files/ml4music_workshop/wavenet_36_hours.mp3) after ~36 hours of training on 1xGTX1080
+
+If you have access to sufficient GPU hardware and you interested in using WaveNet I've included a few basic instructions below. You will find the interface very similar to both char-rnn and midi-rnn.
+
+Before running [tensorflow-wavenet](https://github.com/ibab/tensorflow-wavenet) inside of your docker container, install the latest [Nvidia drivers](https://www.nvidia.com/Download/index.aspx) and [nvidia-docker](https://github.com/NVIDIA/nvidia-docker) so that the docker container can have access to your Nvidia graphics card (this will only work on Nvidia graphics cards).
+
+Once you have both of those things installed attach to your docker container by passing the `--gpu` flag to `start.sh`:
+
+```bash
+./start.sh --gpu
+```
+
+I've setup a python virtual environment for tensorflow-wavenet, because it requires a different version of tensorflow than char-rnn-tensorflow. Run the following commands:
+
+```bash
+# enter the wavenet folder
+cd tensorflow-wavenet
+
+# activate the virtualenv
+source venv/bin/activate
+
+# install gpu enabled tensorflow
+pip install tensorflow-gpu=0.12
+```
+
+I've included the Erykah Badu track that I used for training inside `data/audio/data`. You can remove that or add whatever `.wav` files you would like to train from into that folder. WaveNet will train using all `.wav` files in the folder passed to `--data_dir`.
+
+### Training a WaveNet model
+
+```bash
+# I've needed to supress the silence threshold with every wav I've tried
+# but you may not need to
+python train.py --data_dir ../data/audio/data/ --silence_threshold 0
+```
+
+To view your training metrics, navigate your web browser to:
+
+- <http://localhost:7008>
+
+Training can take multiple days, so just keep an eye on your loss and when it begins to converge you can probably stop training.
+
+### Generating audio from a WaveNet model
+
+Generate 10 seconds of audio from your trained model like this:
+
+```bash
+python generate.py --samples 160000 --wav_out ../data/audio/generated.wav
+```
+
+This should generate a wave file located at `data/audio/generated.wav` on your host machine.
+
+## Conclusion
+
+Well thats it! I hope this worked well for whoever got this far and that you've learned about some cool new tools. Feel free to drop me a line w/ any questions or comments at brannon@brannondorsey.com.
+
+<3 Brannon
