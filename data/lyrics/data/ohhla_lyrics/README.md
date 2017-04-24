@@ -7,7 +7,7 @@ wget --mirror --convert-links --adjust-extension --page-requisites --no-parent -
 This command can take hours to run. Consistently check to see how many lyrics files have been downloaded with:
 
 ```bash
-finx ohhla.com -name *.txt | wc -l
+find ohhla.com -name *.txt | wc -l
 ```
 
 If that number stops going up for a long period of time (overnight) you can likely stop the download. Combine all lyrics into one file with:
