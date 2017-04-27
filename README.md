@@ -298,7 +298,7 @@ Last year, Google's Deep Mind [published a paper](https://arxiv.org/pdf/1609.034
 
 Training a WaveNet model is increadibly difficult and compute-intensive. Training models takes days running on consumer grade GPUs and isn't much worth trying on CPUs. I've had very poor results with WaveNet after just one experiment.
 
-- [Original track](http://brannondorsey.com/files/ml4music_workshop/wavenet_12_hours.wav), Erykah Badu's "On and on" (A capella) 
+- [Original track](http://brannondorsey.com/files/ml4music_workshop/eyrkah_badu_on_and_on.mp3), Erykah Badu's "On and on" (A capella) 
 - [WaveNet generated track](http://brannondorsey.com/files/ml4music_workshop/wavenet_12_hours.mp3) after ~12 hours of training on 1xGTX1080
 - [WaveNet generated track](http://brannondorsey.com/files/ml4music_workshop/wavenet_36_hours.mp3) after ~36 hours of training on 1xGTX1080
 
