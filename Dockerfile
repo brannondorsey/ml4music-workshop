@@ -1,4 +1,4 @@
-FROM nvidia/cuda:8.0-devel-ubuntu16.04
+FROM nvidia/cuda:8.0-cudnn5-devel-ubuntu16.04
 
 # create a non-root user named "docker"
 # we will use this when the user is logged in
@@ -17,6 +17,7 @@ RUN git submodule update
 
 # remove unnecessary files
 RUN rm setup_wavenet_venv.sh
+RUN rm start.sh
 RUN rm Dockerfile
 RUN rm -rf notebooks
 
